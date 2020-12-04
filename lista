@@ -1,0 +1,66 @@
+LIBRERIA.H
+
+#ifndef LISTA_H_INCLUDED
+#define LISTA_H_INCLUDED
+#include "consumos.h"
+
+typedef struct _nodoLista{
+stConsumos dato;
+struct _nodoLista* sig;
+}nodoLista;
+
+nodoLista * inicLista();
+nodoLista * crearNodo(stConsumos dato);
+nodoLista * agregarAlFinal(nodoLista * lista, nodoLista * nuevo);
+nodoLista * buscaUltimoLista(nodoLista * lista);
+void muestraLista(nodoLista * lista);
+
+
+#endif // LISTA_H_INCLUDED
+
+LIBRERIA.C
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "lista.h"
+
+nodoLista * inicLista() {
+    return NULL;
+}
+
+nodoLista * crearNodo(stConsumos dato) {
+
+    nodoLista* nuevo = (nodoLista*) malloc(sizeof(nodoLista));
+    nuevo->dato = dato;
+    nuevo->sig = NULL;
+
+    return nuevo;
+}
+
+nodoLista * agregarAlFinal(nodoLista * lista, nodoLista * nuevo) {
+    if(!lista) {
+        lista = nuevo;
+    }
+    else {
+        nodoLista * ultimo = buscaUltimoLista(lista);
+        ultimo->sig = nuevo;
+    }
+    return lista;
+}
+
+nodoLista * buscaUltimoLista(nodoLista * lista){
+    nodoLista * seg = lista;
+    while(seg->sig){
+        seg = seg->sig;
+    }
+    return seg;
+}
+
+void muestraLista(nodoLista * lista) {
+    nodoLista * seg = lista;
+    while(seg) {
+        muestraUnConsumo(seg->dato);
+        seg = seg->sig;
+    }
+}
