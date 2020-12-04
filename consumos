@@ -1,0 +1,146 @@
+LIBRERIA.H
+
+#ifndef CONSUMOS_H_INCLUDED
+#define CONSUMOS_H_INCLUDED
+#include "clientes.h"
+
+typedef struct
+{
+    int id;  /// campo único y autoincremental
+    int idCliente;
+    int anio;
+    int mes; /// 1 a 12
+    int dia; /// 1 a … dependiendo del mes
+    int datosConsumidos;  /// expresados en mb.
+    int baja; /// 0 si está activo - 1 si está eliminado
+} stConsumos;
+
+void cicloCargaConsumo();
+void muestraUnConsumo(stConsumos consumo);
+void mostrarConsumosCliente(stCliente cliente);
+void mostrarConsumoPorCliente();
+
+#endif // CONSUMOS_H_INCLUDED
+
+LIBRERIA.C
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <string.h>
+
+#include "consumos.h"
+#include "hijas.h"
+#include "archiConsumos.h"
+#include "Arboles.h"
+
+#define AR_CONSUMOS "consumos.dat"
+#define AR_CLIENTES "clientes.dat"
+
+
+void cicloCargaConsumo()
+{
+
+    stConsumos consumo;
+    int nroaux=0;
+    int flag=0;
+
+    //ID AUTOINCREMENTAL
+    system("cls");
+    consumo.id=cantidadConsumos()+1;
+    printf("\n\t REGISTRO ID: %d \n",consumo.id);
+
+    do{
+        printf("\n CODIGO NUMERICO -NroCliente-: \n");
+        scanf("%d", &consumo.idCliente);
+        nroaux = consumo.idCliente;
+        flag=idRepetido(AR_CLIENTES,nroaux); // modularizado
+        if(flag==0)
+        {
+            printf("\n\t No existe un usuario registrado con el numero %d ",nroaux);
+        }
+    }
+    while(flag==0);
+
+
+    printf("Ingrese mes:\n");
+    consumo.mes = validarFecha(12);
+    printf("Ingrese dia:\n");
+    consumo.dia = validarFecha(maximoDiaDelMes(consumo.mes));
+    printf("Ingrese anio:\n");
+    consumo.anio = validarFecha(2020);
+
+    printf("\nIngrese datos consumidos actualmente (mb):\n ");
+    fflush(stdin);
+    scanf("%d", &consumo.datosConsumidos);
+    ///#### ##### #####
+
+    consumo.baja = 0;
+
+    printf("\nCONFIMAR CARGA O CANCELAR?:\n ");
+    if(cajaDeTexto("Valor invalido.") == 2) {
+        dPrincipal();
+    }
+
+
+    ///####### GUARDADO ARCHIVO######################
+    FILE* archivo;
+    archivo = fopen(AR_CONSUMOS, "ab");
+
+    fwrite(&consumo, sizeof(stConsumos), 1, archivo);
+    fclose(archivo);
+
+    ///############################################
+    printf("\n");
+    system("pause");
+
+}
+
+
+void muestraUnConsumo(stConsumos consumo)
+{
+    printf("\n--------------------------------\n");
+    printf("\n ID CONSUMO: %d", consumo.id);
+    printf("\n ID CLIENTE: %d", consumo.idCliente);
+    printf("\n FECHA:  %d/%d/%d", consumo.dia, consumo.mes, consumo.anio);
+    printf("\n Consumo:  %d (mb)\n", consumo.datosConsumidos);
+
+    consumo.baja == 1 ? printf("\n ESTADO: |inactivo| \n") : printf("\n ESTADO: |activo| \n");
+
+    printf("\n################################# \n");
+}
+
+void mostrarConsumosCliente(stCliente cliente) {
+    stConsumos consumo;
+    FILE * archi = fopen(AR_CONSUMOS, "rb");
+    if(archi) {
+        while(fread(&consumo, sizeof(stConsumos), 1, archi) > 0) {
+            if (consumo.idCliente == cliente.nroCliente) {
+                muestraUnConsumo(consumo);
+            }
+        }
+        fclose(archi);
+    }
+}
+
+void mostrarConsumoPorCliente() {
+    printf("\nIngrese el dni del cliente: \n");
+
+    stCliente cliente;
+    int dni;
+    scanf("%d", &dni);
+
+    int existe = existeCliente(dni);
+    if (existe == 1) {
+        cliente = buscaCliente(dni);
+
+        printf("\n ********* CLIENTE *********");
+        muestraUnCliente(cliente);
+        printf("\n ********* CONSUMOS *********");
+        mostrarConsumosCliente(cliente);
+    }
+    else {
+        printf("\nEl cliente no existe.\n");
+    }
+
+}
