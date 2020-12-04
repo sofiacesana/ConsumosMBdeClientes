@@ -1,0 +1,375 @@
+LIBRERIA.H
+
+#ifndef HIJAS_H_INCLUDED
+#define HIJAS_H_INCLUDED
+#include "Arboles.h"
+
+void dPrincipal();
+void dClientes();
+void dConsumos();
+nodoArbol* menuArbol(nodoArbol* arbol);
+int cajaDeTexto(char mensaje[]);
+int idRepetido(char archivo[], int dato);
+int cuentaDigitos(long int dato);
+int datoInvalido(long int dato, int opt);
+int maximoDiaDelMes(int mes);
+int validarFecha(int valorMaximo);
+
+#endif // HIJAS_H_INCLUDED
+
+LIBRERIA.C
+
+#include "archiConsumos.h"
+
+#define AR_CLIENTES "clientes.dat"
+#define AR_CONSUMOS "consumos.dat"
+
+///Menu principal
+void dPrincipal(nodoArbol * arbol)
+{
+    system("cls");
+    printf("\t\t\t*** A|G|E|N|D|A CLIENTES & CONSUMOS ***\t\t\t");
+    printf("\n\n\n");
+    printf("\n\t 1) Menu de -CLIENTES- \n\t");
+    printf("\n\t 2) Menu de -CONSUMOS- \n\t");
+    printf("\n\t 3) Menu de -ARBOL- \n\t");
+    printf("\n\n\t");
+    printf("\n |ESC| para -FINALIZAR-  \n\t");
+    int opt=47;//azar
+    do
+    {
+        scanf("%d", &opt);
+
+        switch(opt)
+        {
+        case 1:
+            system("cls");
+            dClientes(arbol);
+            break;
+        case 2:
+            system("cls");
+            dConsumos(arbol);
+            break;
+         case 3:
+            system("cls");
+            menuArbol(arbol);
+        }
+        dPrincipal(arbol);
+    }
+    while(opt!=0);
+
+}
+///////////////////////////////
+
+void dClientes(nodoArbol * arbol)
+{
+    system("cls");
+    printf("\t\t\t | C L I E N T E S | \t\t\t\n");
+    printf("\n\t 1) -ALTA- \n\t");
+    printf("\n\t 2) -MODIFICAR ESTADO CLIENTE (BAJA/ALTA)- \n\t");
+    printf("\n\t 3) -MODIFICAR UN CLIENTE- \n\t");
+    printf("\n\t 4) -MOSTRAR |CLIENTES ACTIVOS| - \n\t");
+    printf("\n\t 5) -MOSTRAR |CLIENTES INACTIVOS| - \n\t");
+    printf("\n\n\t");
+
+    printf("\n |0| para -RETROCEDER-  \n");
+    printf("\n\n\t");
+    int opt=47;
+    do
+    {
+        scanf("%d", &opt);
+
+        switch(opt)
+        {
+        case 1:
+            system("cls");
+            cicloCargaCliente();
+            break;
+        case 2:
+            system("cls");
+            bajaCliente();
+            break;
+        case 3:
+            system("cls");
+            modificarCliente();
+            break;
+        case 4:
+            system("cls");
+            reparteAeI();
+            system("cls");
+            listarClientesActivos();
+            break;
+        case 5:
+            system("cls");
+            listarClientesInactivos();
+            break;
+        }
+        dPrincipal(arbol);
+    }
+    while(opt!=0);
+}
+//////////////////////////////////////
+
+void dConsumos(nodoArbol * arbol)
+{
+    system("cls");
+    printf("\t\t\t | C O N S U M O S | \t\t\t\n");
+    printf("\n\t 1) -ALTA- \n\t");
+    printf("\n\t 2) -MODIFICAR ESTADO CONSUMO (BAJA/ALTA)- \n\t");
+    printf("\n\t 3) -MODIFICAR CONSUMO- \n\t");
+    printf("\n\t 4) -MOSTRAR |LISTAS CONSUMOS| - \n\t");
+    printf("\n\t 5) -BUSCAR CONSUMO POR FECHA- \n\t");
+    printf("\n\t 6) -BUSCAR CONSUMO POR CLIENTE- \n\t");
+    printf("\n\n\t");
+    printf("\n |0| para -RETROCEDER- \n\t");
+    printf("\n\n\t");
+
+    int opt=47;
+    do
+    {
+        scanf("%d", &opt);
+
+        switch(opt)
+        {
+        case 1:
+            cicloCargaConsumo();
+            break;
+        case 2:
+            bajaConsumo();
+            break;
+        case 3:
+            modificarConsumo();
+            break;
+        case 4:
+            listarConsumos();
+            break;
+        case 5:
+            system("cls");
+            buscarConsumoPorFecha();
+            break;
+        case 6:
+            system("cls");
+            mostrarConsumoPorCliente();
+            system("pause");
+        }
+        dPrincipal(arbol);
+    }
+    while(opt!=0);
+
+}
+/////////////////////////////////////////
+
+nodoArbol * menuArbol(nodoArbol * arbol) {
+
+    system("cls");
+    printf("\t\t\t | A R B O L E S | \t\t\t\n");
+    printf("\n\t 1) -GENERAR ARBOL A PARTIR DEL ARCHIVO- \n\t");
+    printf("\n\t 2) -MOSTRAR EL ARBOL- \n\t");
+    printf("\n\t 3) -LIQUIDAR UN MES- \n\t");
+    printf("\n\t 4) -BORRAR UN CLIENTE Y SUS CONSUMOS- \n\t");
+    printf("\n\n\t");
+    printf("\n |0| para -RETROCEDER- \n\t");
+    printf("\n\n\t");
+
+    stCliente c;
+    int dni;
+    int nro;
+
+    int opt=47;
+    do
+    {
+        scanf("%d", &opt);
+
+        switch(opt) {
+        case 1:
+            arbol = cliente2Arbol(arbol);
+            arbol = asignaConsumosArbol(arbol);
+            system("pause");
+            break;
+        case 2:
+            subMenuMostrarArbol(arbol);
+            system("pause");
+            break;
+
+        case 3:
+            printf("\n Ingrese el DNI del cliente: ");
+            scanf("%d", &dni);
+            c = buscaCliente(dni);
+            if(c.baja == -1) {
+                printf("\nEl cliente no existe.\n");
+            }
+            else {
+                arbol = liquidaConsumos(arbol,c.nroCliente);
+            }
+            system("pause");
+            break;
+
+         case 4:
+            printf("\n Ingrese el Nro del cliente: ");
+            scanf("%d", &nro);
+
+            nodoArbol * buscado = buscaClienteArbol(arbol, nro);
+
+            if(buscado) {
+                arbol = borrarNodo(arbol, nro);
+                printf("\nEl cliente con sus respectivos consumos ha sido borrado exitosamente.\n");
+            }
+            else {
+                printf("\nEl numero de cliente ingresado es inexistente.\n");
+            }
+            system("pause");
+        }
+        dPrincipal(arbol);
+    }
+    while(opt!=0);
+    return arbol;
+}
+
+////////////////////////////////////////////////
+
+int cajaDeTexto(char mensaje[])
+{
+    printf("\n\t 1)Confirmar ");
+    printf("\n\t 2)Retroceder \n");
+    int opt = 0;
+    int v = 0;
+    while((opt != 1 || opt != 2) && v == 0)
+    {
+        fflush(stdin);
+        scanf("%d", &opt);
+        if(opt != 1 && opt != 2)
+        {
+            printf("%s\n", mensaje);
+        }
+        else
+        {
+            v = 1;
+        }
+    }
+
+    return opt;
+}
+/////////////////////////////////////////////////
+
+int idRepetido(char archivo[], int dato)
+{
+    int flag=0;
+    stCliente aux;
+    FILE *archCliente;
+    archCliente=fopen(AR_CLIENTES,"rb");
+    if(archCliente!=NULL)
+    {
+        while(fread(&aux,sizeof(stCliente),1,archCliente)>0 && flag==0)
+        {
+            if(aux.nroCliente==dato)
+            {
+                flag=1;
+                printf("\n\t\t\t -CLIENTE EXISTENTE- \n");
+            }
+            else
+            {
+                flag=0;
+            }
+        }
+        fclose(archCliente);
+    }
+
+    return flag;
+}
+/////////////////////////////////////////////////////////////////////////////////
+
+int cuentaDigitos(long int dato)
+{
+    int i = 0;
+    while (dato != 0)
+    {
+        dato /= 10;     // n = n/10
+        ++i;
+    }
+    return i;
+}
+/////////////////////////////////////
+
+int datoInvalido(long int dato, int opt)
+{
+    int digitos=cuentaDigitos(dato);
+    if (opt == 1) //telefono
+    {
+        while (digitos != 10)
+        {
+            printf("\n###Ingreso un telefono no valido(%d digitos), \n Ingrese un numero de 10 digitos (ej 5492235812327): ###",digitos);
+            scanf("%lu", &dato);
+            digitos=cuentaDigitos(dato);
+        }
+    }
+    else if (opt == 2) //dni
+    {
+        while (digitos != 8)
+        {
+            printf("\n###Ingreso un dni no valido(%d digitos), \n Ingrese un numero de 8 digitos (ej 38831318): ###",digitos);
+            scanf("%lu", &dato);
+            digitos=cuentaDigitos(dato);
+        }
+    }
+
+    return dato;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int maximoDiaDelMes(int mes)
+{
+    int maximo = 30;
+
+    switch(mes)
+    {
+    case 1:
+        maximo = 31;
+        break;
+    case 2:
+        maximo = 28;
+        break;
+    case 3:
+        maximo = 31;
+        break;
+    case 5:
+        maximo = 31;
+        break;
+    case 7:
+        maximo = 31;
+        break;
+    case 8:
+        maximo = 31;
+        break;
+    case 10:
+        maximo = 31;
+        break;
+    case 12:
+        maximo = 31;
+        break;
+    }
+    return maximo;
+}
+////////////////////////////////////////////////////
+
+int validarFecha(int valorMaximo)
+{
+    int fecha = 0;
+    int flag = 0;
+    while(flag == 0)
+    {
+        scanf("%d", &fecha);
+        if(fecha <= valorMaximo)
+        {
+            flag = 1;
+        }
+        else
+        {
+            flag = 0;
+            printf("Ingrese un valor menor a: %d \n", valorMaximo);
+        }
+    }
+    return fecha;
+}
+
+
+
